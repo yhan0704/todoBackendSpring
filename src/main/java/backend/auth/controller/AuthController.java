@@ -1,6 +1,7 @@
 package backend.auth.controller;
 
 import backend.auth.dto.request.LoginRequest;
+import backend.auth.dto.request.RefreshTokenRequest;
 import backend.auth.dto.request.SignupRequest;
 import backend.auth.dto.response.LoginResponse;
 import backend.auth.service.AuthService;
@@ -24,5 +25,16 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginResponse> refresh(@RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.ok(authService.refresh(request));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestBody RefreshTokenRequest request) {
+        authService.logout(request);
+        return ResponseEntity.ok().build();
     }
 }

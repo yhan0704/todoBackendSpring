@@ -74,7 +74,7 @@ Header와 Payload는 **Base64로 인코딩만 되어 있을 뿐 암호화가 아
 
 Access Token 수명을 짧게 두는 이유: 토큰이 탈취되더라도 피해 시간을 짧게 만들기 위해서입니다. 대신 매번 로그인하긴 귀찮으니, 오래 사는 Refresh Token으로 "새 Access Token 다시 줘"를 할 수 있게 하는 구조입니다.
 
-> ⚠️ 참고: 지금 이 프로젝트는 Refresh Token을 **발급만 하고**, 그걸로 재발급받는 `/auth/refresh` 같은 엔드포인트는 아직 없습니다. (다음 할 일 목록에 있음)
+> ⚠️ 업데이트: `/auth/refresh`(재발급), `/auth/logout`(무효화) 엔드포인트가 추가되었습니다. Refresh Token은 발급 시 `User.refreshToken` 컬럼에 저장되고, 재발급/로그아웃 때마다 그 값과 비교·회전(rotate)됩니다. 그래서 로그아웃하거나 재발급을 한 번 받으면 이전 Refresh Token은 즉시 무효가 됩니다 (탈취돼도 서버가 막을 수 있음). 또한 Access/Refresh Token 모두 payload에 `type` claim(`access`/`refresh`)을 넣어서, Refresh Token으로는 보호된 API를 호출할 수 없게 구분합니다.
 
 ## 5. 로그인 흐름 (지금 코드 기준)
 
@@ -151,7 +151,9 @@ Spring Security는 요청이 컨트롤러에 도달하기 *전에* "필터 체�
 
 ## 8. 앞으로 남은 것 (오늘 안 하는 것)
 
-- Refresh Token 재발급 엔드포인트 (`/auth/refresh`)
+- ~~Refresh Token 재발급 엔드포인트 (`/auth/refresh`)~~ 완료 — `/auth/refresh`, `/auth/logout` 추가, Refresh Token 회전/무효화 포함
+- ~~JWT 시크릿 하드코딩 → `application.properties`로 분리~~ 완료 — `jwt.secret`을 `JWT_SECRET` 환경변수로 오버라이드 가능. **운영 배포 전에는 반드시 `JWT_SECRET` 환경변수를 새로 생성한 값으로 설정할 것** (properties의 값은 로컬 개발용 기본값일 뿐)
 - Todo ↔ User 연관관계 (지금 Todo 엔티티엔 누가 만들었는지 필드가 없음)
-- JWT 시크릿 하드코딩 → `application.properties`로 분리
-- 인증 실패 시 에러 응답 형식 통일 (`@RestControllerAdvice`)
+- 인증 실패 시 에러 응답 형식 통일 (`@RestControllerAdvice`) — 지금은 `RuntimeException`이 그대로 500으로 나감
+- 로그인 관련 로직에 `@Transactional` 미적용 — 현재는 `save()`를 명시 호출해서 우회 중
+- 역할(Role) 기반 인가 없음 — `JwtAuthenticationFilter`가 항상 빈 권한 리스트로 인증 처리

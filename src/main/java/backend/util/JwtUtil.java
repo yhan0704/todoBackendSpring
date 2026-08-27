@@ -1,59 +1,81 @@
 package backend.util;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.util.Date;
 
 @Component
 public class JwtUtil {
 
-    private final Key key = Keys.hmacShaKeyFor(
-            "mysecretkeymysecretkeymysecretkeymysecretkey".getBytes()
-    );
+    private static final String TYPE_CLAIM = "type";
+    private static final String TYPE_ACCESS = "access";
+    private static final String TYPE_REFRESH = "refresh";
 
-    // Access Token 1시간
+    private final SecretKey key;
+    private final long accessTokenExpirationMs;
+    private final long refreshTokenExpirationMs;
+
+    public JwtUtil(
+            @Value("${jwt.secret}") String secret,
+            @Value("${jwt.access-token-expiration-ms}") long accessTokenExpirationMs,
+            @Value("${jwt.refresh-token-expiration-ms}") long refreshTokenExpirationMs
+    ) {
+        this.key = Keys.hmacShaKeyFor(secret.getBytes());
+        this.accessTokenExpirationMs = accessTokenExpirationMs;
+        this.refreshTokenExpirationMs = refreshTokenExpirationMs;
+    }
+
     public String generateAccessToken(String email) {
-        return Jwts.builder()
-                .subject(email)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
-                .signWith(key)
-                .compact();
+        return buildToken(email, TYPE_ACCESS, accessTokenExpirationMs);
     }
 
-    // Refresh Token 30일
     public String generateRefreshToken(String email) {
+        return buildToken(email, TYPE_REFRESH, refreshTokenExpirationMs);
+    }
+
+    private String buildToken(String email, String type, long expirationMs) {
         return Jwts.builder()
                 .subject(email)
+                .claim(TYPE_CLAIM, type)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 30))
+                .expiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(key)
                 .compact();
     }
 
-    // 토큰에서 이메일 추출
     public String getEmail(String token) {
-        return Jwts.parser()
-                .verifyWith((javax.crypto.SecretKey) key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
+        return parseClaims(token).getSubject();
     }
 
-    // 토큰 유효성 검사
-    public boolean validateToken(String token) {
+    // Access token 검증: 서명/만료가 유효하고 type이 "access"인 경우에만 true
+    public boolean validateAccessToken(String token) {
+        return validateTokenOfType(token, TYPE_ACCESS);
+    }
+
+    // Refresh token 검증: 서명/만료가 유효하고 type이 "refresh"인 경우에만 true
+    public boolean validateRefreshToken(String token) {
+        return validateTokenOfType(token, TYPE_REFRESH);
+    }
+
+    private boolean validateTokenOfType(String token, String expectedType) {
         try {
-            Jwts.parser()
-                    .verifyWith((javax.crypto.SecretKey) key)
-                    .build()
-                    .parseSignedClaims(token);
-            return true;
+            Claims claims = parseClaims(token);
+            return expectedType.equals(claims.get(TYPE_CLAIM, String.class));
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private Claims parseClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 }
