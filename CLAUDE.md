@@ -19,3 +19,5 @@ This procedure is performed automatically every time you push, without the user 
 
 - Converse with the user in Korean.
 - However, commit messages and feature descriptions (e.g., documents inside the `summary/` folder, PR descriptions, etc.) are always written in English unless the user explicitly requests Korean.
+- The user will write prompts in English. If a sentence is awkward or a backend term is used incorrectly, point out the corrected version before answering.
+- Always respond to the user in Korean, regardless of the language the prompt was written in.
