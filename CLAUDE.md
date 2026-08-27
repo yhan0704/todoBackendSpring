@@ -1,16 +1,21 @@
 # CLAUDE.md
 
-이 파일은 Claude Code가 이 프로젝트에서 세션 시작 시 자동으로 읽는 프로젝트 지침입니다.
+This file is a project guideline that Claude Code automatically reads at the start of a session in this project.
 
-## Git push 전 필수 절차
+## Required procedure before `git push`
 
-`git push`를 하기 전에는 항상 다음 순서를 따릅니다.
+Always follow these steps before running `git push`.
 
-1. `summary/<코딩한 날짜, YYYY-MM-DD>/` 폴더를 확인한다. 오늘 날짜 폴더가 없으면 새로 만든다.
-2. 그 폴더 안에, 이번에 커밋할 내용을 설명하는 파일을 하나 추가한다.
-   - 파일명: `NN-짧은-kebab-case-설명.md` (NN은 그 날짜 폴더 안에서 다음 순서 번호, 2자리 zero-padding, 커밋 순서와 동일해야 함)
-   - 파일 맨 위에 `# 커밋 <해시 또는 "예정"> — <커밋 메시지 요약>` 제목을 쓴다.
-   - 무엇을·왜 바꿨는지 짧은 불릿으로 정리한다. 배경 설명이 길어져도 이 파일 안에 다 쓴다 (별도로 흩어놓지 않는다).
-3. 그 다음 커밋을 만들고 push한다.
+1. Check the `summary/<coding date, YYYY-MM-DD>/` folder. If today's date folder doesn't exist, create it.
+2. Inside that folder, add a file describing what's being committed this time.
+   - Filename: `NN-short-kebab-case-description.md` (NN is the next sequence number within that date folder, 2-digit zero-padded, and must match the commit order).
+   - At the top of the file, write the title `# Commit <hash or "pending"> — <commit message summary>`.
+   - Summarize what was changed and why in short bullet points. Even if the background explanation gets long, write it all in this file (don't scatter it elsewhere).
+3. Then create the commit and push.
 
-이 절차는 사용자가 매번 요청하지 않아도 push할 때마다 자동으로 수행합니다.
+This procedure is performed automatically every time you push, without the user needing to request it each time.
+
+## Language rules
+
+- Converse with the user in Korean.
+- However, commit messages and feature descriptions (e.g., documents inside the `summary/` folder, PR descriptions, etc.) are always written in English unless the user explicitly requests Korean.
