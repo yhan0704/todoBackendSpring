@@ -1,0 +1,9 @@
+# Copy this file to application-local.properties and fill in your own local values.
+# application-local.properties is gitignored and must NEVER be committed.
+
+spring.datasource.url=jdbc:postgresql://localhost:5433/mydb
+spring.datasource.username=your_local_username
+spring.datasource.password=your_local_password
+
+# Generate your own secret, e.g.: openssl rand -base64 64
+jwt.secret=generate_your_own_random_base64_secret

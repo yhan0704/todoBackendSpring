@@ -35,3 +35,9 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Personal notes ###
+top1Tier.md
+
+### Local secrets ###
+application-local.properties
