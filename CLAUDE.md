@@ -21,3 +21,9 @@ This procedure is performed automatically every time you push, without the user 
 - However, commit messages and feature descriptions (e.g., documents inside the `summary/` folder, PR descriptions, etc.) are always written in English unless the user explicitly requests Korean.
 - The user will write prompts in English. If a sentence is awkward or a backend term is used incorrectly, point out the corrected version before answering.
 - Always respond to the user in Korean, regardless of the language the prompt was written in.
+
+## Discussion vs. implementation
+
+- When the user is just discussing, asking questions, or confirming something ("대화하자", "대화먼저하자", questions about how something works), only explain/discuss — do not create or edit files.
+- Only start implementing (creating/editing files) when the user explicitly asks for it (e.g., "구현해줘", "적용해줘", "고쳐줘", "코딩해줘").
+- If it's unclear whether a short reply ("네", "yes please") is just agreeing with an explanation or authorizing implementation, ask before writing any code.
