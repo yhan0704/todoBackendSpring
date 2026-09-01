@@ -1,5 +1,6 @@
 package backend.auth.service;
 import lombok.extern.slf4j.Slf4j;
+import backend.common.exception.EmailAlreadyExistsException;
 import backend.auth.dto.request.LoginRequest;
 import backend.auth.dto.request.RefreshTokenRequest;
 import backend.auth.dto.request.SignupRequest;
@@ -18,16 +19,23 @@ public class AuthService {
 
     private static final String INVALID_CREDENTIALS_MESSAGE = "이메일 또는 비밀번호가 올바르지 않습니다.";
     private static final String INVALID_REFRESH_TOKEN_MESSAGE = "유효하지 않은 토큰입니다.";
+    private static final String EMAIL_ALREADY_EXISTS_MESSAGE = "이미 가입된 이메일입니다.";
 
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
     private final BCryptPasswordEncoder passwordEncoder;
 
     public void signup(SignupRequest request) {
+        String email = normalizeEmail(request.email());
+
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new EmailAlreadyExistsException(EMAIL_ALREADY_EXISTS_MESSAGE);
+        }
+
         String encodedPassword = passwordEncoder.encode(request.password());
 
         User user = User.builder()
-                .email(request.email())
+                .email(email)
                 .password(encodedPassword)
                 .name(request.name())
                 .build();
@@ -36,7 +44,7 @@ public class AuthService {
     }
 
     public LoginResponse login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.email())
+        User user = userRepository.findByEmail(normalizeEmail(request.email()))
                 .orElseThrow(() -> new RuntimeException(INVALID_CREDENTIALS_MESSAGE));
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new RuntimeException(INVALID_CREDENTIALS_MESSAGE);
@@ -77,6 +85,10 @@ public class AuthService {
                     user.updateRefreshToken(null);
                     userRepository.save(user);
                 });
+    }
+
+    private String normalizeEmail(String email) {
+        return email.trim().toLowerCase();
     }
 
     private LoginResponse issueTokens(User user) {
