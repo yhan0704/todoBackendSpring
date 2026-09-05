@@ -17,12 +17,16 @@ public class TodoService {
 
     private final TodoRepository todoRepository;
 
-    public List<Todo> getAllTodos() {
-        return todoRepository.findAll();
+    public List<TodoResponse> getAllTodos() {
+        return todoRepository.findAll().stream()
+                .map(TodoResponse::from)
+                .toList();
     }
 
-    public Todo getTodo(Long id) {
-        return todoRepository.findById(id).orElseThrow(() -> new RuntimeException("Todo not found: " + id));
+    public TodoResponse getTodo(Long id) {
+        Todo todo = todoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Todo not found: " + id));
+        return TodoResponse.from(todo);
     }
 
     @Transactional
