@@ -31,6 +31,9 @@ public class TodoService {
         Todo todo = Todo.builder()
                 .tasks(request.tasks())
                 .done(request.done())
+                .priority(request.priority())
+                .dueDate(request.dueDate())
+                .category(request.category())
                 .build();
         Todo saved = todoRepository.save(todo);
         return TodoResponse.from(saved);
@@ -39,7 +42,7 @@ public class TodoService {
     @Transactional
     public TodoResponse editTodo(Long id, TodoCreateRequest request) {
         Todo todo = todoRepository.findById(id).orElseThrow(() -> new RuntimeException("Todo not found"));
-        todo.update(request.tasks(), request.done());  // 수정!
+        todo.update(request.tasks(), request.done(), request.priority(), request.dueDate(), request.category());  // 수정!
         return TodoResponse.from(todo);
     }
 

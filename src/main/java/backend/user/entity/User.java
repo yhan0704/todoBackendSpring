@@ -3,6 +3,8 @@ package backend.user.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "users")
 @Getter
@@ -22,6 +24,10 @@ public class User {
 
     private String password;
     private String refreshToken;
+
+    private String nickname;
+    private String phone;
+    private LocalDate birthDate;
 
     public void updateEmail(String email) {
         this.email = email;

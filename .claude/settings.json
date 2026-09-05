@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \"import bcrypt; print\\(bcrypt.hashpw\\(b'password123', bcrypt.gensalt\\(\\)\\).decode\\(\\)\\)\")",
+      "Bash(python -c \"import bcrypt; print\\(bcrypt.hashpw\\(b'password123', bcrypt.gensalt\\(\\)\\).decode\\(\\)\\)\")",
+      "Bash(node -e \"console.log\\(require\\('bcryptjs'\\).hashSync\\('password123',10\\)\\)\")",
+      "Bash(find ~/.gradle -iname \"spring-security-crypto*.jar\" 2>/dev/null | head -5)",
+      "Read(//c/Users/dudck/.gradle/**)",
+      "Bash(find ~/.gradle -iname \"commons-logging*.jar\" -o -iname \"spring-jcl*.jar\" 2>/dev/null | head -5)",
+      "Bash(./gradlew compileJava --console=plain -q)",
+      "Bash(ls -la \"/c/Users/dudck/Documents/miniShoppingMall\\(fullstack\\)\" 2>&1 *)",
+      "Read(//c/Users/dudck/Documents/miniShoppingMall\\\\\\(fullstack\\\\\\)/**)",
+      "Bash(TARGET=\"/c/Users/dudck/Documents/miniShoppingMall\\(fullstack\\)\" *)",
+      "Read(//c/Users/dudck/Documents/miniShoppingMall\\\\\\(fullstack\\\\\\)/src/main/resources/**)",
+      "Bash(rm -rf '/c/Users/dudck/Documents/miniShoppingMall\\(fullstack\\)/src/main/java/backend/todo')",
+      "Bash(rm -rf '/c/Users/dudck/Documents/miniShoppingMall\\(fullstack\\)/src/test/java/backend/todo')",
+      "Read(//c/Users/dudck/Documents/miniShoppingMall\\\\\\(fullstack\\\\\\)/src/main/java/backend//**)",
+      "Read(//c/Users/dudck/Documents/miniShoppingMall\\\\\\(fullstack\\\\\\)/src/test/java/backend//**)",
+      "Bash(./gradlew compileJava compileTestJava --console=plain -q)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\dudck\\Documents\\miniShoppingMall(fullstack)\\src\\main\\resources",
+      "C:\\Users\\dudck\\Documents\\miniShoppingMall(fullstack)"
+    ]
+  }
+}
