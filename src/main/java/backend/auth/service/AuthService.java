@@ -6,7 +6,9 @@ import backend.common.exception.InvalidTokenException;
 import backend.auth.dto.request.LoginRequest;
 import backend.auth.dto.request.RefreshTokenRequest;
 import backend.auth.dto.request.SignupRequest;
+import backend.auth.dto.response.LoginResponse;
 import backend.auth.dto.response.TokenResponse;
+import backend.user.dto.response.UserResponse;
 import backend.user.entity.User;
 import backend.user.repository.UserRepository;
 import backend.util.JwtUtil;
@@ -51,7 +53,7 @@ public class AuthService {
     // 이메일 미존재/비밀번호 불일치를 구분하지 않고 동일한 InvalidCredentialsException으로 통일
     // (계정 존재 여부를 노출하는 이메일 이넘어레이션(enumeration) 공격 방지). 실패 시 브루트포스
     // 탐지용으로 로그만 남기고, 어떤 사유인지는 응답에 드러내지 않음
-    public TokenResponse login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
         String email = normalizeEmail(request.email());
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> {
@@ -63,7 +65,21 @@ public class AuthService {
             throw new InvalidCredentialsException(INVALID_CREDENTIALS_MESSAGE);
         }
 
-        return issueTokens(user);
+        return new LoginResponse(issueTokens(user), UserResponse.from(user));
+    }
+
+    // refresh token을 평문이 아닌 BCrypt 해시로 저장 — DB가 유출되어도 저장된 값만으로는
+    // 토큰을 복원할 수 없어 바로 계정 탈취로 이어지지 않음. 비교는 refresh()/logout()에서
+    // passwordEncoder.matches로 수행
+    private TokenResponse issueTokens(User user) {
+        String accessToken = jwtUtil.generateAccessToken(user.getEmail());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getEmail());
+
+        // refresh token을 회전(rotate)시켜 저장 — 탈취된 이전 토큰은 더 이상 쓸 수 없음
+        user.updateRefreshToken(passwordEncoder.encode(refreshToken));
+        userRepository.save(user);
+
+        return new TokenResponse(accessToken, refreshToken);
     }
 
     // refresh token은 DB에 해시로만 저장되므로(issueTokens 참고) 여기서도 평문 토큰을 그대로
@@ -92,7 +108,7 @@ public class AuthService {
 
         return issueTokens(user);
     }
-
+    
     // 로그아웃은 실패해도 사용자에게 에러를 보여줄 필요가 없는 멱등 동작이라 예외를 던지지 않고
     // 조용히 무시. 저장된 해시와 매칭되는 경우에만 refresh token을 폐기(null)해서, 이미 만료/폐기된
     // 토큰으로 다른 세션의 토큰을 지우는 일이 없게 함
@@ -113,19 +129,5 @@ public class AuthService {
 
     private String normalizeEmail(String email) {
         return email.trim().toLowerCase();
-    }
-
-    // refresh token을 평문이 아닌 BCrypt 해시로 저장 — DB가 유출되어도 저장된 값만으로는
-    // 토큰을 복원할 수 없어 바로 계정 탈취로 이어지지 않음. 비교는 refresh()/logout()에서
-    // passwordEncoder.matches로 수행
-    private TokenResponse issueTokens(User user) {
-        String accessToken = jwtUtil.generateAccessToken(user.getEmail());
-        String refreshToken = jwtUtil.generateRefreshToken(user.getEmail());
-
-        // refresh token을 회전(rotate)시켜 저장 — 탈취된 이전 토큰은 더 이상 쓸 수 없음
-        user.updateRefreshToken(passwordEncoder.encode(refreshToken));
-        userRepository.save(user);
-
-        return new TokenResponse(accessToken, refreshToken);
     }
 }

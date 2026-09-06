@@ -3,6 +3,7 @@ package backend.auth.controller;
 import backend.auth.dto.request.LoginRequest;
 import backend.auth.dto.request.RefreshTokenRequest;
 import backend.auth.dto.request.SignupRequest;
+import backend.auth.dto.response.LoginResponse;
 import backend.auth.dto.response.TokenResponse;
 import backend.auth.service.AuthService;
 import jakarta.validation.Valid;
@@ -26,7 +27,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
