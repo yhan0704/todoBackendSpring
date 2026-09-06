@@ -16,7 +16,8 @@
       "Bash(rm -rf '/c/Users/dudck/Documents/miniShoppingMall\\(fullstack\\)/src/test/java/backend/todo')",
       "Read(//c/Users/dudck/Documents/miniShoppingMall\\\\\\(fullstack\\\\\\)/src/main/java/backend//**)",
       "Read(//c/Users/dudck/Documents/miniShoppingMall\\\\\\(fullstack\\\\\\)/src/test/java/backend//**)",
-      "Bash(./gradlew compileJava compileTestJava --console=plain -q)"
+      "Bash(./gradlew compileJava compileTestJava --console=plain -q)",
+      "Bash(git mv *)"
     ],
     "additionalDirectories": [
       "C:\\Users\\dudck\\Documents\\miniShoppingMall(fullstack)\\src\\main\\resources",

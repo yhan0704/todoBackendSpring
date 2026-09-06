@@ -6,7 +6,7 @@ import backend.common.exception.InvalidTokenException;
 import backend.auth.dto.request.LoginRequest;
 import backend.auth.dto.request.RefreshTokenRequest;
 import backend.auth.dto.request.SignupRequest;
-import backend.auth.dto.response.LoginResponse;
+import backend.auth.dto.response.TokenResponse;
 import backend.user.entity.User;
 import backend.user.repository.UserRepository;
 import backend.util.JwtUtil;
@@ -51,7 +51,7 @@ public class AuthService {
     // 이메일 미존재/비밀번호 불일치를 구분하지 않고 동일한 InvalidCredentialsException으로 통일
     // (계정 존재 여부를 노출하는 이메일 이넘어레이션(enumeration) 공격 방지). 실패 시 브루트포스
     // 탐지용으로 로그만 남기고, 어떤 사유인지는 응답에 드러내지 않음
-    public LoginResponse login(LoginRequest request) {
+    public TokenResponse login(LoginRequest request) {
         String email = normalizeEmail(request.email());
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> {
@@ -69,7 +69,7 @@ public class AuthService {
     // refresh token은 DB에 해시로만 저장되므로(issueTokens 참고) 여기서도 평문 토큰을 그대로
     // equals 비교할 수 없어 passwordEncoder.matches로 검증. 서명/만료/보유 여부 중 하나라도
     // 실패하면 모두 같은 InvalidTokenException으로 처리해 실패 사유를 응답에 노출하지 않음
-    public LoginResponse refresh(RefreshTokenRequest request) {
+    public TokenResponse refresh(RefreshTokenRequest request) {
         String token = request.refreshToken();
 
         if (!jwtUtil.validateRefreshToken(token)) {
@@ -118,7 +118,7 @@ public class AuthService {
     // refresh token을 평문이 아닌 BCrypt 해시로 저장 — DB가 유출되어도 저장된 값만으로는
     // 토큰을 복원할 수 없어 바로 계정 탈취로 이어지지 않음. 비교는 refresh()/logout()에서
     // passwordEncoder.matches로 수행
-    private LoginResponse issueTokens(User user) {
+    private TokenResponse issueTokens(User user) {
         String accessToken = jwtUtil.generateAccessToken(user.getEmail());
         String refreshToken = jwtUtil.generateRefreshToken(user.getEmail());
 
@@ -126,6 +126,6 @@ public class AuthService {
         user.updateRefreshToken(passwordEncoder.encode(refreshToken));
         userRepository.save(user);
 
-        return new LoginResponse(accessToken, refreshToken);
+        return new TokenResponse(accessToken, refreshToken);
     }
 }

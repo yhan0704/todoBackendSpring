@@ -1,6 +1,8 @@
 package backend.auth.dto.response;
 
+import backend.user.dto.response.UserResponse;
+
 public record LoginResponse(
-        String accessToken,
-        String refreshToken
+        TokenResponse tokens,
+        UserResponse user
 ) {}
