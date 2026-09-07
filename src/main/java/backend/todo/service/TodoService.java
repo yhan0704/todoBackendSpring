@@ -4,7 +4,10 @@ import backend.todo.dto.TodoCreateRequest;
 import backend.todo.dto.response.TodoResponse;
 import backend.todo.entity.Todo;
 import backend.todo.repository.TodoRepository;
+import backend.user.entity.User;
+import backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +19,7 @@ import java.util.List;
 public class TodoService {
 
     private final TodoRepository todoRepository;
+    private final UserRepository userRepository;
 
     public List<TodoResponse> getAllTodos() {
         return todoRepository.findAll().stream()
@@ -31,6 +35,11 @@ public class TodoService {
 
     @Transactional
     public TodoResponse createTodo(TodoCreateRequest request) {
+        // JwtAuthenticationFilter가 인증 성공 시 email을 principal로 SecurityContext에 넣어둠
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found: " + email));
+
         // record는 request.tasks(), request.done() 처럼 메서드 형식으로 값을 꺼냅니다.
         Todo todo = Todo.builder()
                 .tasks(request.tasks())
@@ -38,6 +47,10 @@ public class TodoService {
                 .priority(request.priority())
                 .dueDate(request.dueDate())
                 .category(request.category())
+                // Todo에 소유자(user)를 연결 — 이게 빠지면 user_id가 null로 저장됨(오늘 실제로 겪은 버그).
+                // Todo.user는 @ManyToOne(fetch=LAZY)로 매핑돼있어서, 여기서 세팅한 User 객체 참조가
+                // 저장 시점에 Hibernate가 알아서 user_id 외래키 값으로 변환해서 넣어줌.
+                .user(user)
                 .build();
         Todo saved = todoRepository.save(todo);
         return TodoResponse.from(saved);
