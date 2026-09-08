@@ -39,6 +39,18 @@ public class SecurityConfig {
         return source;
     }
 
+    // 이 프로젝트가 세션이 아닌 JWT로 인증하기 때문에 Spring Security의 기본 동작들을 대부분
+    // 꺼야 함. 각 설정이 "왜" 필요한지:
+    // - csrf.disable(): CSRF는 브라우저가 쿠키/세션을 자동으로 실어 보내는 걸 노리는 공격이라
+    //   서버에 세션이 없는 stateless API에는 해당 위협이 없음
+    // - formLogin.disable(): Spring Security 기본 로그인 폼/리다이렉트를 끄고, 우리가 만든
+    //   /auth/login(AuthService)으로만 로그인하게 함
+    // - authorizeHttpRequests: /auth/**(로그인, 회원가입, 토큰 재발급)는 아직 토큰이 없는
+    //   상태에서 호출돼야 하니 permitAll, 그 외 모든 요청은 인증(토큰 검증)을 요구
+    // - addFilterBefore: 요청이 UsernamePasswordAuthenticationFilter(폼 로그인용 기본 필터)에
+    //   닿기 전에 JwtAuthenticationFilter를 먼저 태워서, 헤더의 토큰을 검증하고
+    //   SecurityContext에 인증 정보를 채워 넣음. 이게 있어야 authorizeHttpRequests의
+    //   authenticated() 판단이 실제로 "유효한 토큰이 있는가"를 기준으로 동작함
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http

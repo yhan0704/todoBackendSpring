@@ -26,8 +26,6 @@ public class Todo {
     private LocalDate dueDate;
     private String category;
 
-    // 지금은 nullable=true — TodoService.createTodo가 아직 로그인한 유저를 넣어주지 않아서
-    // false로 하면 API로 만드는 todo마다 저장 실패남. join 연습용 seed 데이터만 우선 채움.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
