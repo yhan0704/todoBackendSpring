@@ -19,8 +19,8 @@ public class TodoController {
     private final TodoService todoService;
 
     @GetMapping
-    public ResponseEntity<List<TodoResponse>> getAllTodos() {
-        return ResponseEntity.ok(todoService.getAllTodos());
+    public ResponseEntity<List<TodoResponse>> getMyTodos() {
+        return ResponseEntity.ok(todoService.getMyTodos());
     }
 
     @GetMapping("/{id}")

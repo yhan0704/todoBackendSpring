@@ -1,9 +1,11 @@
 package backend.user.entity;
 
+import backend.todo.entity.Todo;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -28,6 +30,9 @@ public class User {
     private String nickname;
     private String phone;
     private LocalDate birthDate;
+
+    @OneToMany(mappedBy = "user")
+    private List<Todo> todos;
 
     public void updateEmail(String email) {
         this.email = email;

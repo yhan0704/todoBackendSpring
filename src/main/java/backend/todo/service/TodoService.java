@@ -27,6 +27,18 @@ public class TodoService {
                 .toList();
     }
 
+    // 로그인한 유저 소유의 todos만 반환 — getAllTodos()는 전체 유저의 todos를 다 반환하므로
+    // (나중에 admin 전용으로 쓸 수 있게 남겨둠) 컨트롤러에는 이 메서드만 노출함
+    public List<TodoResponse> getMyTodos() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found: " + email));
+
+        return todoRepository.findByUser(user).stream()
+                .map(TodoResponse::from)
+                .toList();
+    }
+
     public TodoResponse getTodo(Long id) {
         Todo todo = todoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Todo not found: " + id));

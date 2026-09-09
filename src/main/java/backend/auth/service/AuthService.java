@@ -55,7 +55,7 @@ public class AuthService {
     // 탐지용으로 로그만 남기고, 어떤 사유인지는 응답에 드러내지 않음
     public LoginResponse login(LoginRequest request) {
         String email = normalizeEmail(request.email());
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmailWithTodos(email)
                 .orElseThrow(() -> {
                     log.warn("login failed - no such user: email={}", email);
                     return new InvalidCredentialsException(INVALID_CREDENTIALS_MESSAGE);
