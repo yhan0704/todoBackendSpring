@@ -7,6 +7,7 @@ import backend.todo.repository.TodoRepository;
 import backend.user.entity.User;
 import backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,13 +71,31 @@ public class TodoService {
 
     @Transactional
     public TodoResponse editTodo(Long id, TodoCreateRequest request) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found: " + email));
+
         Todo todo = todoRepository.findById(id).orElseThrow(() -> new RuntimeException("Todo not found"));
+        // id 비교로 소유자 확인 — todo.getUser()와 currentUser는 JPA가 따로 조회한 별개의 인스턴스라
+        // 기본 equals()(참조 비교)로는 같은 유저여도 false가 나옴
+        if (!todo.getUser().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("본인 소유의 Todo만 수정할 수 있습니다");
+        }
         todo.update(request.tasks(), request.done(), request.priority(), request.dueDate(), request.category());  // 수정!
         return TodoResponse.from(todo);
     }
 
     @Transactional
     public Long deleteTodo(Long id) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found: " + email));
+
+        Todo todo = todoRepository.findById(id).orElseThrow(() -> new RuntimeException("Todo not found: " + id));
+        // editTodo와 동일한 소유자 확인 — 없으면 다른 유저의 todo도 지울 수 있음
+        if (!todo.getUser().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("본인 소유의 Todo만 삭제할 수 있습니다");
+        }
         todoRepository.deleteById(id);
         return id;
     }

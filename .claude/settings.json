@@ -9,10 +9,15 @@
       "Bash(find ~/.gradle -iname \"commons-logging*.jar\" -o -iname \"spring-jcl*.jar\" 2>/dev/null | head -5)",
       "Bash(./gradlew compileJava --console=plain -q)",
       "Bash(./gradlew compileJava compileTestJava --console=plain -q)",
-      "Bash(git mv *)"
+      "Bash(git mv *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(./gradlew compileJava -q)"
     ],
     "deny": [
-      "Read(**/application-local.properties)"
+      "Read(**/application-local.properties)",
+      "Bash(cat **/application-local.properties)",
+      "Bash(*Get-Content*application-local.properties*)"
     ]
   }
 }
