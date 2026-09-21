@@ -62,3 +62,25 @@ WHERE NOT EXISTS (SELECT 1 FROM todos WHERE tasks = '친구 생일 선물 사기
 INSERT INTO todos (tasks, done, priority, due_date, category, user_id, created_at, updated_at)
 SELECT '독서 30분', false, 'LOW', NULL, '자기계발', NULL, now(), now()
 WHERE NOT EXISTS (SELECT 1 FROM todos WHERE tasks = '독서 30분');
+
+-- 추천 카테고리 10개 (user_id NULL = 모든 유저가 같이 쓰는 공용 카테고리).
+INSERT INTO categories (name, user_id)
+SELECT '건강', NULL WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = '건강');
+INSERT INTO categories (name, user_id)
+SELECT '요리', NULL WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = '요리');
+INSERT INTO categories (name, user_id)
+SELECT '업무', NULL WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = '업무');
+INSERT INTO categories (name, user_id)
+SELECT '쇼핑', NULL WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = '쇼핑');
+INSERT INTO categories (name, user_id)
+SELECT '운동', NULL WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = '운동');
+INSERT INTO categories (name, user_id)
+SELECT '공부', NULL WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = '공부');
+INSERT INTO categories (name, user_id)
+SELECT '집안일', NULL WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = '집안일');
+INSERT INTO categories (name, user_id)
+SELECT '여행', NULL WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = '여행');
+INSERT INTO categories (name, user_id)
+SELECT '재정', NULL WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = '재정');
+INSERT INTO categories (name, user_id)
+SELECT '자기계발', NULL WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = '자기계발');
