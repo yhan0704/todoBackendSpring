@@ -17,6 +17,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     @Value("${cors.allowed-origin}")
     private String allowedOrigin;
@@ -47,6 +49,9 @@ public class SecurityConfig {
     //   /auth/login(AuthService)으로만 로그인하게 함
     // - authorizeHttpRequests: /auth/**(로그인, 회원가입, 토큰 재발급)는 아직 토큰이 없는
     //   상태에서 호출돼야 하니 permitAll, 그 외 모든 요청은 인증(토큰 검증)을 요구
+    // - exceptionHandling: 기본값(Http403ForbiddenEntryPoint)을 쓰면 토큰이 없거나 만료됐을 뿐인
+    //   요청도(=401이어야 함) 403 + 빈 바디로 응답돼서 프론트의 401 기반 refresh 로직이 동작하지
+    //   않았음. CustomAuthenticationEntryPoint로 그런 경우를 401로 통일함
     // - addFilterBefore: 요청이 UsernamePasswordAuthenticationFilter(폼 로그인용 기본 필터)에
     //   닿기 전에 JwtAuthenticationFilter를 먼저 태워서, 헤더의 토큰을 검증하고
     //   SecurityContext에 인증 정보를 채워 넣음. 이게 있어야 authorizeHttpRequests의
@@ -59,6 +64,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                        .accessDeniedHandler(customAccessDeniedHandler)
                 )
                 .formLogin(form -> form.disable())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
