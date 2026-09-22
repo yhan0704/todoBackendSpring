@@ -23,4 +23,8 @@ public class Category {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    public void update(String name) {
+        this.name = name;
+    }
 }
