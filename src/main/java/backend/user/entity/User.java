@@ -34,10 +34,6 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Todo> todos;
 
-    public void updateEmail(String email) {
-        this.email = email;
-    }
-
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }

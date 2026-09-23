@@ -1,6 +1,5 @@
 package backend.user.service;
 
-import backend.user.dto.request.UpdateEmailRequest;
 import backend.user.dto.response.UserResponse;
 import backend.user.entity.User;
 import backend.user.repository.UserRepository;
@@ -20,16 +19,6 @@ public class UserService {
     public UserResponse getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found: " + id));
-        return UserResponse.from(user);
-    }
-
-    @Transactional
-    public UserResponse updateEmail(Long id, UpdateEmailRequest request) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found: " + id));
-
-        user.updateEmail(request.email());
-
         return UserResponse.from(user);
     }
 }

@@ -1,6 +1,5 @@
 package backend.user.controller;
 
-import backend.user.dto.request.UpdateEmailRequest;
 import backend.user.dto.response.UserResponse;
 import backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +16,5 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
-    }
-
-    @PutMapping("/{id}/email")
-    public ResponseEntity<UserResponse> updateEmail(
-            @PathVariable Long id,
-            @RequestBody UpdateEmailRequest request) {
-        return ResponseEntity.ok(userService.updateEmail(id, request));
     }
 }
