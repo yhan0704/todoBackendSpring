@@ -1,6 +1,7 @@
 package backend.todo.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import backend.category.entity.Category;
 import backend.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -24,7 +25,10 @@ public class Todo {
     private boolean done;
     private String priority;
     private LocalDate dueDate;
-    private String category;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -35,7 +39,7 @@ public class Todo {
     @LastModifiedDate  // 추가
     private LocalDateTime updatedAt;
 
-    public void update(String tasks, boolean done, String priority, LocalDate dueDate, String category) {
+    public void update(String tasks, boolean done, String priority, LocalDate dueDate, Category category) {
         this.tasks = tasks;
         this.done = done;
         this.priority = priority;

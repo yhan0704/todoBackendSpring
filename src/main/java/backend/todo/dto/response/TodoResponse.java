@@ -10,7 +10,8 @@ public record TodoResponse(
         boolean done,
         String priority,
         LocalDate dueDate,
-        String category,
+        Long categoryId,
+        String categoryName,
         java.time.LocalDateTime createdAt,
         java.time.LocalDateTime updatedAt
     ) {
@@ -21,7 +22,8 @@ public record TodoResponse(
                 todo.isDone(),
                 todo.getPriority(),
                 todo.getDueDate(),
-                todo.getCategory(),
+                todo.getCategory() != null ? todo.getCategory().getId() : null,
+                todo.getCategory() != null ? todo.getCategory().getName() : null,
                 todo.getCreatedAt(),
                 todo.getUpdatedAt()
         );

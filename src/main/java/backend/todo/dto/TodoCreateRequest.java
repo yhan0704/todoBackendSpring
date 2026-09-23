@@ -7,6 +7,6 @@ public record TodoCreateRequest(
         boolean done,
         String priority,
         LocalDate dueDate,
-        String category
+        Long categoryId
 ) {
 }
